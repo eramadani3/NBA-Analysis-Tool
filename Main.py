@@ -6,8 +6,9 @@ from selenium.webdriver.safari.webdriver import WebDriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
+
 pd.set_option('display.max_columns', None)
-url = 'https://www.nba.com/stats/leaders?Season=2012-13&PerMode=Totals'
+url = 'https://www.nba.com/stats/leaders?Season=2019-20&PerMode=Totals'
 
 driver = webdriver.Safari()
 # Set up Selenium webdriver
@@ -38,6 +39,7 @@ try:
         data.append(row_data)
 
     df = pd.DataFrame(data, columns=headers)
+
     print(df)
 finally:
     # Quit the driver
