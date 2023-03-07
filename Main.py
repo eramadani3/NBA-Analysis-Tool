@@ -8,6 +8,9 @@ from selenium.webdriver.support import expected_conditions as EC
 
 pd.set_option('display.max_columns', None)
 
+# Initialize an empty list to hold data from all seasons
+all_season_data = []
+
 # Loop through each season from 2010-11 to 2022-23
 for year in range(2010, 2023):
     season = str(year) + '-' + str(year+1)[-2:]
@@ -36,21 +39,25 @@ for year in range(2010, 2023):
         # Extract the table headers
         header_row = rows[0]
         headers = [th.text.strip() for th in header_row.find_all('th')]
+        headers.insert(0, "SEASON") # Add SEASON column header
 
         # Extract the table data
         for row in rows[1:]:
             cells = row.find_all('td')
-            row_data = []
+            row_data = [season] # Add SEASON value to row data
             for cell in cells:
                 row_data.append(cell.text.strip())
             data.append(row_data)
 
-        df = pd.DataFrame(data, columns=headers)
-
-        # Output the data to a CSV file for the current season
-        filename = f"{season}_stats.csv"
-        df.to_csv(filename, index=False)
+        season_df = pd.DataFrame(data, columns=headers)
+        all_season_data.append(season_df)
 
     finally:
         # Quit the driver
         driver.quit()
+
+# Concatenate data from all seasons into a single dataframe
+full_df = pd.concat(all_season_data, ignore_index=True)
+
+# Output the data to a CSV file for all seasons
+full_df.to_csv("all_seasons_stats.csv", index=False)
