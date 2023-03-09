@@ -63,85 +63,85 @@ class View(customtkinter.Frame):
         # Start the tkinter main loop
         root.mainloop()
     def create_court(self,ax, color):
-            # Short corner 3PT lines
-            ax.plot([-220, -220], [0, 140], linewidth=2, color=color)
-            ax.plot([220, 220], [0, 140], linewidth=2, color=color)
+        # Short corner 3PT lines
+        ax.plot([-220, -220], [0, 140], linewidth=2, color=color)
+        ax.plot([220, 220], [0, 140], linewidth=2, color=color)
 
-            # 3PT Arc
-            ax.add_artist(mpl.patches.Arc((0, 140), 440, 315, theta1=0, theta2=180, facecolor='none', edgecolor=color, lw=2))
+        # 3PT Arc
+        ax.add_artist(mpl.patches.Arc((0, 140), 440, 315, theta1=0, theta2=180, facecolor='none', edgecolor=color, lw=2))
 
-            # Lane and Key
-            ax.plot([-80, -80], [0, 190], linewidth=2, color=color)
-            ax.plot([80, 80], [0, 190], linewidth=2, color=color)
-            ax.plot([-60, -60], [0, 190], linewidth=2, color=color)
-            ax.plot([60, 60], [0, 190], linewidth=2, color=color)
-            ax.plot([-80, 80], [190, 190], linewidth=2, color=color)
-            ax.add_artist(mpl.patches.Circle((0, 190), 60, facecolor='none', edgecolor=color, lw=2))
+        # Lane and Key
+        ax.plot([-80, -80], [0, 190], linewidth=2, color=color)
+        ax.plot([80, 80], [0, 190], linewidth=2, color=color)
+        ax.plot([-60, -60], [0, 190], linewidth=2, color=color)
+        ax.plot([60, 60], [0, 190], linewidth=2, color=color)
+        ax.plot([-80, 80], [190, 190], linewidth=2, color=color)
+        ax.add_artist(mpl.patches.Circle((0, 190), 60, facecolor='none', edgecolor=color, lw=2))
 
-            # Rim
-            ax.add_artist(mpl.patches.Circle((0, 60), 15, facecolor='none', edgecolor=color, lw=2))
+        # Rim
+        ax.add_artist(mpl.patches.Circle((0, 60), 15, facecolor='none', edgecolor=color, lw=2))
 
-            # Backboard
-            ax.plot([-30, 30], [40, 40], linewidth=2, color=color)
+        # Backboard
+        ax.plot([-30, 30], [40, 40], linewidth=2, color=color)
 
-            # Remove ticks
-            ax.set_xticks([])
-            ax.set_yticks([])
+        # Remove ticks
+        ax.set_xticks([])
+        ax.set_yticks([])
 
-            # Set axis limits
-            ax.set_xlim(-250, 250)
-            ax.set_ylim(0, 470)
+        # Set axis limits
+        ax.set_xlim(-250, 250)
+        ax.set_ylim(0, 470)
 
-            return ax
+        return ax
     def create_plot(self):
-            # Get user input from GUI
-            player_name = self.player_name_entry.get()
-            team_name = self.team_name_entry.get()
-            year = self.year_entry.get()
+        # Get user input from GUI
+        player_name = self.player_name_entry.get()
+        team_name = self.team_name_entry.get()
+        year = self.year_entry.get()
 
-            # Get player ID
-            first, last = player_name.split()
-            player_id = Model.get_player_id(first, last)
+        # Get player ID
+        first, last = player_name.split()
+        player_id = Model.get_player_id(first, last)
 
-            # Create JSON request
-            shot_json = shotchartdetail.ShotChartDetail(
-                team_id=Model.get_team_id(team_name),
-                player_id=player_id,
-                context_measure_simple='PTS',
-                season_nullable=year,
-                season_type_all_star='Regular Season')
+        # Create JSON request
+        shot_json = shotchartdetail.ShotChartDetail(
+            team_id=Model.get_team_id(team_name),
+            player_id=player_id,
+            context_measure_simple='PTS',
+            season_nullable=year,
+            season_type_all_star='Regular Season')
 
-            shot_data = json.loads(shot_json.get_json())
+        shot_data = json.loads(shot_json.get_json())
 
-            relevant_data = shot_data['resultSets'][0]
-            headers = relevant_data['headers']
-            rows = relevant_data['rowSet']
+        relevant_data = shot_data['resultSets'][0]
+        headers = relevant_data['headers']
+        rows = relevant_data['rowSet']
 
-            # Create pandas DataFrame
-            player_data = pd.DataFrame(rows)
-            player_data.columns = headers
+        # Create pandas DataFrame
+        player_data = pd.DataFrame(rows)
+        player_data.columns = headers
 
-            mpl.rcParams['font.family'] = 'Avenir'
-            mpl.rcParams['font.size'] = 18
-            mpl.rcParams['axes.linewidth'] = 2
-            # Create figure and axes
-            fig = plt.figure(figsize=(4, 3.76))
-            ax = fig.add_axes([0, 0, 1, 1])
-            ax.set_title(f"{player_name} ({year}) Stats")
+        mpl.rcParams['font.family'] = 'Avenir'
+        mpl.rcParams['font.size'] = 18
+        mpl.rcParams['axes.linewidth'] = 2
+        # Create figure and axes
+        fig = plt.figure(figsize=(4, 3.76))
+        ax = fig.add_axes([0, 0, 1, 1])
+        ax.set_title(f"{player_name} ({year}) Stats")
 
-            # Draw court
-            ax = self.create_court(ax, 'black')
+        # Draw court
+        ax = self.create_court(ax, 'black')
 
-            # Plot hexbin of shots
-            ax.hexbin(player_data['LOC_X'], player_data['LOC_Y'] + 60, gridsize=(30, 30), extent=(-300, 300, 0, 940), bins='log', cmap='Reds')
+        # Plot hexbin of shots
+        ax.hexbin(player_data['LOC_X'], player_data['LOC_Y'] + 60, gridsize=(30, 30), extent=(-300, 300, 0, 940), bins='log', cmap='Reds')
 
-            # Annotate player name and season
-            ax.text(0, 1.05, f'{player_name}\n{year} Regular Season', transform=ax.transAxes, ha='left', va='baseline')
+        # Annotate player name and season
+        ax.text(0, 1.05, f'{player_name}\n{year} Regular Season', transform=ax.transAxes, ha='left', va='baseline')
 
-            # save the figure with a filename based on the player name and year
-            filename = f"{player_name}_{year}_stats.png"
-            fig.savefig(filename)
-            plt.show()
+        # save the figure with a filename based on the player name and year
+        filename = f"{player_name}_{year}_stats.png"
+        fig.savefig(filename)
+        plt.show()
     
 class Controller:
     def __init__(self, model, view):
