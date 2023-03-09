@@ -12,7 +12,7 @@ pd.set_option('display.max_columns', None)
 all_season_data = []
 
 # Loop through each season from 2010-11 to 2022-23
-for year in range(2010, 2023):
+for year in range(1970, 2023):
     season = str(year) + '-' + str(year+1)[-2:]
     print(f"Processing data for {season} season...")
 
