@@ -25,26 +25,6 @@ def get_player_id(first, last):
             return player['playerId']
     return -1
 
-# Create JSON request
-shot_json = shotchartdetail.ShotChartDetail(
-            team_id = get_team_id('Golden State Warriors'),
-            player_id = get_player_id('Stephen', 'Curry'),
-            context_measure_simple = 'PTS',
-            season_nullable = '2015-16',
-            season_type_all_star = 'Regular Season')
-
-# Load data into a Python dictionary
-shot_data = json.loads(shot_json.get_json())
-
-relevant_data = shot_data['resultSets'][0]
-headers = relevant_data['headers']
-rows = relevant_data['rowSet']
-
-# Create pandas DataFrame
-curry_data = pd.DataFrame(rows)
-curry_data.columns = headers
-
-
 def create_court(ax, color):
     
     # Short corner 3PT lines
@@ -79,6 +59,32 @@ def create_court(ax, color):
     return ax
 
 
+player_name = input("Enter the player's name (First and last name): ")
+team_name = input("Enter the team name ('City Team'): ")
+year = input("Enter the year (YYYY-YY): ")
+
+first,last = player_name.split()
+# Create JSON request
+shot_json = shotchartdetail.ShotChartDetail(
+            team_id = get_team_id(team_name),
+            player_id = get_player_id(first, last),
+            context_measure_simple = 'PTS',
+            season_nullable = year,
+            season_type_all_star = 'Regular Season')
+
+# Load data into a Python dictionary
+shot_data = json.loads(shot_json.get_json())
+
+relevant_data = shot_data['resultSets'][0]
+headers = relevant_data['headers']
+rows = relevant_data['rowSet']
+
+# Create pandas DataFrame
+player_data = pd.DataFrame(rows)
+player_data.columns = headers
+
+
+
 mpl.rcParams['font.family'] = 'Avenir'
 mpl.rcParams['font.size'] = 18
 mpl.rcParams['axes.linewidth'] = 2
@@ -90,10 +96,10 @@ ax = fig.add_axes([0, 0, 1, 1])
 ax = create_court(ax, 'black')
 
 # Plot hexbin of shots
-ax.hexbin(curry_data['LOC_X'], curry_data['LOC_Y'] + 60, gridsize=(30, 30), extent=(-300, 300, 0, 940), bins='log', cmap='Blues')
+ax.hexbin(player_data['LOC_X'], player_data['LOC_Y'] + 60, gridsize=(30, 30), extent=(-300, 300, 0, 940), bins='log', cmap='Blues')
 
 # Annotate player name and season
-ax.text(0, 1.05, 'Stephen Curry\n2015-16 Regular Season', transform=ax.transAxes, ha='left', va='baseline')
+ax.text(0, 1.05, f'{player_name}\n{year} Regular Season', transform=ax.transAxes, ha='left', va='baseline')
 
 # Save and show figure
 plt.savefig('ShotChart.png', dpi=300, bbox_inches='tight')
