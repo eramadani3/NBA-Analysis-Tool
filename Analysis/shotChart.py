@@ -6,6 +6,7 @@ import requests
 import pandas as pd
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+import customtkinter
 
 # Load teams file
 teams = json.loads(requests.get('https://raw.githubusercontent.com/bttmly/nba/master/data/teams.json').text)
@@ -110,28 +111,31 @@ def create_plot():
 
 
 # Create a tkinter window
-root = Tk()
+root = customtkinter.CTk()
 root.title("NBA Shot Chart")
+root.geometry(f"{500}x{250}")
+
 
 # Create input fields and labels
-player_name_label = Label(root, text="Player Name (First, Last): ")
-player_name_label.grid(row=0, column=0, padx=5, pady=5, sticky=W)
-player_name_entry = Entry(root)
-player_name_entry.grid(row=0, column=1, padx=5, pady=5)
+player_name_label = customtkinter.CTkLabel(root, text="Player Name (First Last): ")
+player_name_label.grid(row=1, column=0, pady=10)
+player_name_entry = customtkinter.CTkEntry(root)
+player_name_entry.grid(row=1, column=1, ipadx="100", pady=10)
 
-team_name_label = Label(root, text="(Team Name City): ")
-team_name_label.grid(row=1, column=0, padx=5, pady=5, sticky=W)
-team_name_entry = Entry(root)
-team_name_entry.grid(row=1, column=1, padx=5, pady=5)
+team_name_label = customtkinter.CTkLabel(root, text="Team (Name City): ")
+team_name_label.grid(row=2, column=0, pady=10)
+team_name_entry = customtkinter.CTkEntry(root)
+team_name_entry.grid(row=2, column=1, ipadx="100", pady=10)
 
-year_label = Label(root, text="Year (YYYY-YY): ")
-year_label.grid(row=2, column=0, padx=5, pady=5, sticky=W)
-year_entry = Entry(root)
-year_entry.grid(row=2, column=1, padx=5, pady=5)
+year_label = customtkinter.CTkLabel(root, text="Year (YYYY-YY): ")
+year_label.grid(row=3,column=0, pady=10)
+year_entry = customtkinter.CTkEntry(root)
+year_entry.grid(row=3, column=1, ipadx="100", pady=10)
 
 # Create a button to trigger data retrieval and visualization
-visualize_button = Button(root, text="Generate Shot Chart", command=create_plot)
-visualize_button.grid(row=3, column=0, columnspan=2, padx=5, pady=5)
+visualize_button = customtkinter.CTkButton(root, text="Generate Shot Chart", command=create_plot)
+visualize_button.grid(row=4,column=1, pady=10)
+
 
 # Start the tkinter main loop
 root.mainloop()
